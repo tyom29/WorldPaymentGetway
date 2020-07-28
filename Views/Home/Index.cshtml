@@ -1,0 +1,41 @@
+﻿@using Microsoft.Extensions.Options
+@inject IOptions<WorldPaySettings>  WorldPay
+@model PayModelView
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <form asp-controller="Home" asp-Action="Complete" id="paymentForm" method="post">
+        <!-- all other fields you want to collect, e.g. name and shipping address -->
+        <div id='paymentSection'></div>
+        <input asp-for="Email" type="email"  placeholder="email"/>
+        <input asp-for="Total" type="number" placeholder="Total" />
+        <input asp-for="Token" />
+
+        <div>
+            <input type="submit" value="Place Order" onclick="Worldpay.submitTemplateForm()" />
+        </div>
+    </form>
+</div>
+
+
+<script src="https://cdn.worldpay.com/v1/worldpay.js">
+</script>
+<script type='text/javascript'>
+        window.onload = function () {
+            Worldpay.useTemplateForm({
+                'clientKey': '@WorldPay.Value.ClientKey',
+                'form': 'paymentForm',
+                'paymentSection': 'paymentSection',
+                'display': 'inline',
+                'reusable': true,
+                'callback': function (obj) {
+                    if (obj && obj.token) {
+                        $('#Token').val(obj.token);
+                        document.getElementById('paymentForm').submit();
+                    }
+                }
+            })
+        };
+</script>
